@@ -1,0 +1,55 @@
+version: "0.1-demo"
+defaults:
+  source: "prototype/illustrative"
+
+rules:
+  - id: DEMO_RF_01
+    level: red
+    scope: realtime
+    when: "state.chest_pain.status == 'answered' and (state.chest_pain.value == True)" # Simplified expression
+    thresholds: { chest_pain_severity: 6 }
+    action: escalate_now
+    route: nurse_on_call
+    patient_message_key: urgent_care_team_informed
+  - id: DEMO_RF_02
+    level: red
+    scope: realtime
+    when: "state.recent_fall.status == 'answered' and state.recent_fall.value == True"
+    action: escalate_now
+    route: nurse_on_call
+  - id: DEMO_RF_03
+    level: red
+    scope: realtime
+    when: "state.breathlessness.status == 'answered' and state.breathlessness.value == True"
+    action: escalate_now
+    route: physician
+  - id: DEMO_RF_04
+    level: red
+    scope: realtime
+    when: "lexical.self_harm_expression == true"
+    action: escalate_now
+    route: care_team_lead
+    patient_message_key: supportive_crisis_resources
+  - id: DEMO_YF_01
+    level: yellow
+    scope: end_of_session
+    when: "trend.weight_kg.delta_3d >= T.weight_gain_3d"
+    thresholds: { weight_gain_3d: 1.5 }
+    route: nurse
+  - id: DEMO_YF_02
+    level: yellow
+    scope: longitudinal
+    when: "trend.med_adherence.missed_7d >= T.missed_doses_7d"
+    thresholds: { missed_doses_7d: 2 }
+    route: pharmacist
+  - id: DEMO_YF_03
+    level: yellow
+    scope: longitudinal
+    when: "trend.sleep_hours.mean_3d <= T.low_sleep_hours"
+    thresholds: { low_sleep_hours: 5.0 }
+    route: nurse
+  - id: DEMO_GF_01
+    level: green
+    scope: longitudinal
+    when: "trend.med_adherence.pct_7d >= T.good_adherence"
+    thresholds: { good_adherence: 0.9 }

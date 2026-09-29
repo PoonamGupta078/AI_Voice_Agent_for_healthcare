@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: careloop
+Version: 0.1.0
+Summary: CareLoop: A Stateful, Evidence-Grounded, Safety-Constrained Voice Agent
+Author-email: Antigravity <antigravity@google.com>
+Requires-Python: >=3.11
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: uvicorn>=0.22.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: streamlit>=1.30.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: simpleeval>=0.9.13
+Requires-Dist: altair>=5.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"

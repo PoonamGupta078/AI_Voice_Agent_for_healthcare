@@ -1,0 +1,109 @@
+slots:
+  - slot_id: chest_pain
+    domain: safety
+    value_type: bool
+    tier: 1
+    frequency: every_session
+    ask_intents: ["ask if patient has chest pain or tightness"]
+    followups: ["pain_severity", "pain_onset", "pain_trigger"]
+
+  - slot_id: breathlessness
+    domain: safety
+    value_type: bool
+    tier: 1
+    frequency: every_session
+    ask_intents: ["ask if patient is feeling breathless or short of breath"]
+    followups: ["breathless_at_rest", "breathless_lying_flat", "onset"]
+
+  - slot_id: recent_fall
+    domain: safety
+    value_type: bool
+    tier: 1
+    frequency: every_session
+    ask_intents: ["ask if patient has had a recent fall"]
+    followups: ["injury", "could_get_up"]
+
+  - slot_id: severe_dizziness_fainting
+    domain: safety
+    value_type: bool
+    tier: 1
+    frequency: every_session
+    ask_intents: ["ask if patient has felt severe dizziness or fainted"]
+    followups: ["onset", "on_standing"]
+
+  - slot_id: med_taken_today
+    domain: medication
+    value_type: bool
+    tier: 2
+    frequency: daily
+    ask_intents: ["ask if patient has taken their medication today"]
+    followups: ["missed_reason"]
+
+  - slot_id: side_effects
+    domain: medication
+    value_type: list
+    tier: 2
+    frequency: daily
+    ask_intents: ["ask if patient is experiencing any side effects from medication"]
+    followups: ["side_effect_severity"]
+
+  - slot_id: weight_kg
+    domain: vital
+    value_type: number
+    unit: kg
+    tier: 2
+    frequency: conditional
+    conditions: ["heart_failure"]
+    ask_intents: ["ask for patient's weight today"]
+    
+  - slot_id: sleep_hours
+    domain: sleep
+    value_type: number
+    tier: 3
+    frequency: daily
+    ask_intents: ["ask how many hours patient slept last night"]
+    followups: ["sleep_quality"]
+
+  - slot_id: activity_minutes
+    domain: activity
+    value_type: number
+    tier: 3
+    frequency: daily
+    ask_intents: ["ask how many minutes patient was active today"]
+    followups: ["activity_type"]
+
+  - slot_id: nutrition_summary
+    domain: nutrition
+    value_type: text
+    tier: 3
+    frequency: daily
+    ask_intents: ["ask about patient's nutrition and meals today"]
+    followups: ["appetite", "salt_or_sugar_adherence"]
+
+  - slot_id: hydration_glasses
+    domain: hydration
+    value_type: number
+    tier: 3
+    frequency: daily
+    ask_intents: ["ask how many glasses of water patient drank today"]
+
+  - slot_id: mood_wellbeing
+    domain: wellbeing
+    value_type: scale_0_10
+    tier: 3
+    frequency: daily
+    ask_intents: ["ask patient to rate their mood and wellbeing from 0 to 10"]
+
+  - slot_id: patient_concerns
+    domain: concern
+    value_type: list
+    tier: 2
+    frequency: every_session
+    ask_intents: ["ask if patient has any concerns to discuss with the doctor"]
+
+  - slot_id: appointment_prep
+    domain: appointment
+    value_type: list
+    tier: 3
+    frequency: conditional
+    ask_intents: ["ask if patient has questions prepared for upcoming appointment"]
