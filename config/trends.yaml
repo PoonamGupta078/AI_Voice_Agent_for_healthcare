@@ -1,0 +1,30 @@
+metrics:
+  - name: weight_kg
+    window_days: 7
+    beneficial: false
+    tolerance: 0.1
+
+  - name: sleep_hours
+    window_days: 7
+    beneficial: true
+    tolerance: 0.2
+
+  - name: activity_minutes
+    window_days: 7
+    beneficial: true
+    tolerance: 5.0
+
+  - name: mood_wellbeing
+    window_days: 7
+    beneficial: true
+    tolerance: 0.5
+
+  - name: hydration_glasses
+    window_days: 7
+    beneficial: true
+    tolerance: 0.5
+
+  - name: glucose_reading
+    window_days: 7
+    beneficial: false
+    tolerance: 5.0

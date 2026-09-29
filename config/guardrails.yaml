@@ -1,0 +1,18 @@
+blocked_patterns:
+  - pattern: "you have .*(disease|diabetes|heart|hypertension|cancer|infection|condition)|your symptoms indicate"
+    reason: diagnosis
+    fallback: "I'm not able to provide a diagnosis. Please speak to your doctor about this."
+
+  - pattern: "stop (taking|your)|double (the dose|your dose)|increase (your dose|the dose)|safe to take more"
+    reason: dose_advice
+    fallback: "I'm not able to advise on medication changes. Please consult your doctor."
+
+  - pattern: "your (glucose|blood sugar|HbA1c|creatinine) (is )?(high|low|normal|abnormal)"
+    reason: lab_interpretation
+    fallback: "I'm not able to interpret lab results. Please discuss these with your doctor."
+
+  - pattern: "you will (be fine|recover|get better)|everything will be fine"
+    reason: false_reassurance
+    fallback: "I will note your concern for your doctor."
+
+deferral_message: "That's a great question. I'll note it for your doctor to address."

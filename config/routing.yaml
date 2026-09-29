@@ -1,0 +1,7 @@
+routing:
+  nurse_on_call: nurse
+  nurse: nurse
+  physician: physician
+  pharmacist: pharmacist
+  care_team_lead: care_team_lead
+  social_worker: social_worker

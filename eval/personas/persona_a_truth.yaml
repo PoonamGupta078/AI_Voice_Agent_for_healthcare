@@ -1,0 +1,305 @@
+# Persona A: Ramesh Sharma - 14-day hidden ground truth
+# Each day has slot values and planted events with expected flags.
+
+days:
+  - day: 1
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 30
+      mood_wellbeing: 7
+      hydration_glasses: 5
+      glucose_reading: 128
+      weight_kg: 72.0
+      nutrition_summary: normal meals
+      patient_concerns: []
+    planted_events: []
+
+  - day: 2
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 25
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      glucose_reading: 135
+      weight_kg: 72.1
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 3
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: false   # MISSED
+      side_effects: []
+      sleep_hours: 6.0
+      activity_minutes: 20
+      mood_wellbeing: 6
+      hydration_glasses: 4
+      glucose_reading: 140
+      weight_kg: 72.0
+      nutrition_summary: had sweets
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_A_01
+        description: Missed evening medication
+        flag_level: yellow
+        flag_rule: DEMO_YF_02
+        slot: med_taken_today_evening
+        expected_turn_to_flag: 1
+
+  - day: 4
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 15
+      mood_wellbeing: 5
+      hydration_glasses: 4
+      glucose_reading: 138
+      weight_kg: 72.3
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 5
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.0
+      activity_minutes: 10
+      mood_wellbeing: 5
+      hydration_glasses: 4
+      glucose_reading: 142
+      weight_kg: 72.3
+      nutrition_summary: poor appetite
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_A_02
+        description: Sleep declining trend over 3 days (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_03
+        slot: sleep_hours
+        expected_turn_to_flag: 1
+
+  - day: 6
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: [blurred_vision]
+      sleep_hours: 4.5
+      activity_minutes: 10
+      mood_wellbeing: 4
+      hydration_glasses: 4
+      glucose_reading: 148
+      weight_kg: 72.4
+      nutrition_summary: skipped lunch
+      patient_concerns: ["eye problems"]
+    planted_events:
+      - event_id: PE_A_03
+        description: Blurred vision - possible side effect (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_02
+        slot: side_effects
+        expected_turn_to_flag: 1
+
+  - day: 7
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.0
+      activity_minutes: 15
+      mood_wellbeing: 5
+      hydration_glasses: 5
+      glucose_reading: 145
+      weight_kg: 72.2
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 8
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 20
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      glucose_reading: 140
+      weight_kg: 72.0
+      nutrition_summary: good diet today
+      patient_concerns: []
+    planted_events: []
+
+  - day: 9
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.0
+      activity_minutes: 25
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      glucose_reading: 185   # HIGH
+      weight_kg: 72.1
+      nutrition_summary: ate extra sweets during festival
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_A_04
+        description: High glucose reading above personal baseline (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_02
+        slot: glucose_reading
+        expected_turn_to_flag: 1
+
+  - day: 10
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 30
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      glucose_reading: 155
+      weight_kg: 72.0
+      nutrition_summary: resumed normal diet
+      patient_concerns: []
+    planted_events: []
+
+  - day: 11
+    slots:
+      chest_pain: true   # RED FLAG
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.0
+      activity_minutes: 5
+      mood_wellbeing: 4
+      hydration_glasses: 4
+      glucose_reading: 145
+      weight_kg: 72.1
+      nutrition_summary: poor appetite
+      patient_concerns: ["chest feels tight when walking"]
+    planted_events:
+      - event_id: PE_A_05
+        description: Chest tightness on walking - RED FLAG
+        flag_level: red
+        flag_rule: DEMO_RF_01
+        slot: chest_pain
+        expected_turn_to_flag: 1
+
+  - day: 12
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 30
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      glucose_reading: 132
+      weight_kg: 72.0
+      nutrition_summary: good diet
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 13
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.5
+      activity_minutes: 45   # improvement GREEN
+      mood_wellbeing: 8
+      hydration_glasses: 7
+      glucose_reading: 125
+      weight_kg: 71.8
+      nutrition_summary: great diet today
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_A_06
+        description: Full adherence and longer walks - GREEN
+        flag_level: green
+        flag_rule: DEMO_GF_01
+        slot: activity_minutes
+        expected_turn_to_flag: 1
+
+  - day: 14
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 40
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      glucose_reading: 128
+      weight_kg: 71.9
+      nutrition_summary: normal
+      patient_concerns: ["preparing questions for doctor"]
+    planted_events: []

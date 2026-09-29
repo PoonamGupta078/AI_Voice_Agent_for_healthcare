@@ -1,0 +1,12 @@
+weights:
+  tier: 3.0
+  relevance: 1.0
+  staleness: 0.5
+  change: 1.5
+  unclear: 1.0
+  fatigue: 2.0
+
+budgets:
+  daily: 10
+  weekly: 18
+  short: 5

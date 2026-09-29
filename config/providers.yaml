@@ -1,0 +1,15 @@
+stt:
+  provider: mock
+  model: null
+
+llm:
+  provider: mock
+  model: null
+
+tts:
+  provider: mock
+  model: null
+
+embeddings:
+  provider: mock
+  model: null

@@ -1,0 +1,294 @@
+# Persona B: Sunita Devi - 14-day hidden ground truth
+days:
+  - day: 1
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 20
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 2
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.0
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      weight_kg: 65.1
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 3
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 10
+      mood_wellbeing: 5
+      hydration_glasses: 4
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 4
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: true   # YELLOW - dizziness on standing
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: [dizziness_on_standing]
+      dizziness_on_standing: true
+      sleep_hours: 6.0
+      activity_minutes: 10
+      mood_wellbeing: 5
+      hydration_glasses: 4
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: ["I feel dizzy when I get up"]
+    planted_events:
+      - event_id: PE_B_01
+        description: Dizziness on standing (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_04
+        slot: severe_dizziness_fainting
+        expected_turn_to_flag: 1
+
+  - day: 5
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      weight_kg: 65.1
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 6
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: [ankle_swelling]
+      swelling: true
+      swelling_location: ankles
+      sleep_hours: 6.0
+      activity_minutes: 10
+      mood_wellbeing: 5
+      hydration_glasses: 4
+      weight_kg: 65.2
+      nutrition_summary: salty food
+      patient_concerns: ["ankles are swollen, is it my medicine?"]
+    planted_events:
+      - event_id: PE_B_02
+        description: Ankle swelling concern (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_02
+        slot: swelling
+        expected_turn_to_flag: 1
+
+  - day: 7
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 8
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: true   # RED FLAG - could not get up
+      could_get_up: false
+      injury: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 0
+      mood_wellbeing: 3
+      hydration_glasses: 3
+      weight_kg: 65.1
+      nutrition_summary: poor
+      patient_concerns: ["I fell this morning and couldn't get up for a while"]
+    planted_events:
+      - event_id: PE_B_03
+        description: Fall, could not get up for a while - RED FLAG
+        flag_level: red
+        flag_rule: DEMO_RF_02
+        slot: recent_fall
+        expected_turn_to_flag: 1
+
+  - day: 9
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.0
+      activity_minutes: 5
+      mood_wellbeing: 4
+      hydration_glasses: 4
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 10
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 10
+      mood_wellbeing: 4
+      hydration_glasses: 3   # LOW
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_B_04
+        description: Low hydration (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_03
+        slot: hydration_glasses
+        expected_turn_to_flag: 1
+
+  - day: 11
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 4.5
+      activity_minutes: 5
+      mood_wellbeing: 3   # low mood streak starting
+      hydration_glasses: 4
+      weight_kg: 65.0
+      nutrition_summary: not eating well
+      patient_concerns: []
+    planted_events: []
+
+  - day: 12
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 4.5
+      activity_minutes: 5
+      mood_wellbeing: 3   # low mood 3 days
+      hydration_glasses: 4
+      weight_kg: 65.0
+      nutrition_summary: poor
+      patient_concerns: ["feeling lonely"]
+    planted_events:
+      - event_id: PE_B_05
+        description: Low mood streak 3 days (yellow)
+        flag_level: yellow
+        flag_rule: DEMO_YF_05
+        slot: mood_wellbeing
+        expected_turn_to_flag: 1
+
+  - day: 13
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.0
+      activity_minutes: 20
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 65.0
+      nutrition_summary: good
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_B_06
+        description: Adherence improved - GREEN
+        flag_level: green
+        flag_rule: DEMO_GF_01
+        slot: med_taken_today_morning
+        expected_turn_to_flag: 1
+
+  - day: 14
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 20
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 65.0
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []

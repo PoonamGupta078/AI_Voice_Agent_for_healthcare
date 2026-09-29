@@ -1,0 +1,19 @@
+phrases:
+  chest_pain:
+    - "\\bchest pain\\b"
+    - "\\bchest tight\\b"
+    - "\\bsina dard\\b"
+
+  breathlessness:
+    - "\\bcannot breathe\\b"
+    - "\\bshort of breath\\b"
+    - "\\bsaans nahi\\b"
+
+  fall:
+    - "\\bi fell\\b"
+    - "\\bgir gaya\\b"
+
+  self_harm:
+    - "\\bwant to die\\b"
+    - "\\bend my life\\b"
+    - "\\bjeena nahi\\b"

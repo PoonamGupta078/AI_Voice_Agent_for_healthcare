@@ -1,0 +1,67 @@
+# Personas (Appendix F) and hidden ground-truth timelines
+
+persona_a:
+  id: persona_a
+  name: Ramesh Sharma
+  age: 68
+  conditions: [type_2_diabetes, hypertension]
+  medications:
+    - name: Metformin
+      schedule: morning
+      dose: "500mg"
+    - name: Amlodipine
+      schedule: evening
+      dose: "5mg"
+  baselines:
+    glucose_reading: 130
+    weight_kg: 72.0
+    sleep_hours: 7.0
+    activity_minutes: 30
+    mood_wellbeing: 7
+  upcoming_appointment_day: 15
+  language: en
+  goals: [control_blood_sugar, maintain_activity, reduce_salt]
+
+persona_b:
+  id: persona_b
+  name: Sunita Devi
+  age: 72
+  conditions: [hypertension, osteoarthritis, fall_risk]
+  medications:
+    - name: Losartan
+      schedule: morning
+      dose: "50mg"
+    - name: Calcium + Vit D
+      schedule: evening
+      dose: "1 tablet"
+  baselines:
+    weight_kg: 65.0
+    sleep_hours: 6.5
+    activity_minutes: 20
+    mood_wellbeing: 6
+    hydration_glasses: 5
+  upcoming_appointment_day: 16
+  language: hinglish
+  goals: [prevent_falls, maintain_hydration, manage_pain]
+
+persona_c:
+  id: persona_c
+  name: George Thomas
+  age: 63
+  conditions: [heart_failure]
+  medications:
+    - name: Furosemide
+      schedule: morning
+      dose: "40mg"
+    - name: Carvedilol
+      schedule: evening
+      dose: "6.25mg"
+  baselines:
+    weight_kg: 70.3
+    sleep_hours: 7.0
+    activity_minutes: 15
+    mood_wellbeing: 6
+    hydration_glasses: 6
+  upcoming_appointment_day: 15
+  language: en
+  goals: [daily_weight_monitoring, salt_restriction, medication_adherence]

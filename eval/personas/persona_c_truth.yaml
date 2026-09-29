@@ -1,0 +1,299 @@
+# Persona C: George Thomas - 14-day hidden ground truth
+days:
+  - day: 1
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 15
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 70.3
+      salt_adherence: true
+      nutrition_summary: low salt diet
+      patient_concerns: []
+    planted_events: []
+
+  - day: 2
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 15
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 70.4
+      salt_adherence: true
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 3
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 10
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 70.5
+      salt_adherence: true
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []  # quiet day
+
+  - day: 4
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 70.6
+      salt_adherence: true
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 5
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 15
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 70.5
+      salt_adherence: true
+      nutrition_summary: good
+      patient_concerns: []
+    planted_events: []
+
+  - day: 6
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 20
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 70.4
+      salt_adherence: true
+      nutrition_summary: good
+      patient_concerns: []
+    planted_events: []
+
+  - day: 7
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 6.5
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 5
+      weight_kg: 70.4
+      salt_adherence: true
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 8
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 15
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 70.4
+      salt_adherence: true
+      nutrition_summary: normal
+      patient_concerns: []
+    planted_events: []
+
+  - day: 9
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: [leg_swelling_mild]
+      swelling: true
+      sleep_hours: 6.5
+      activity_minutes: 10
+      mood_wellbeing: 6
+      hydration_glasses: 6
+      weight_kg: 70.8   # start of weight gain
+      salt_adherence: false   # ate out
+      nutrition_summary: ate outside food - saltier
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_C_01
+        description: Weight beginning to increase, salt adherence break
+        flag_level: yellow
+        flag_rule: DEMO_YF_01
+        slot: weight_kg
+        expected_turn_to_flag: 2
+
+  - day: 10
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: false   # MISSED
+      side_effects: [leg_swelling_mild]
+      sleep_hours: 6.0
+      activity_minutes: 10
+      mood_wellbeing: 5
+      hydration_glasses: 6
+      weight_kg: 71.5   # significant gain
+      salt_adherence: false
+      nutrition_summary: still salty
+      patient_concerns: ["ankles look bigger by evening"]
+    planted_events:
+      - event_id: PE_C_02
+        description: Missed evening dose - yellow
+        flag_level: yellow
+        flag_rule: DEMO_YF_02
+        slot: med_taken_today_evening
+        expected_turn_to_flag: 1
+
+  - day: 11
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 5.5
+      activity_minutes: 5
+      mood_wellbeing: 5
+      hydration_glasses: 5
+      weight_kg: 72.0   # 1.6kg gain in 3 days
+      salt_adherence: true
+      nutrition_summary: low salt resumed
+      patient_concerns: []
+    planted_events: []
+
+  - day: 12
+    slots:
+      chest_pain: false
+      breathlessness: true   # RED FLAG
+      breathless_lying_flat: true   # RED FLAG
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 4.0
+      activity_minutes: 0
+      mood_wellbeing: 3
+      hydration_glasses: 5
+      weight_kg: 72.2
+      salt_adherence: true
+      nutrition_summary: poor appetite
+      patient_concerns: ["short of breath, need extra pillows to sleep", "ankles look bigger"]
+    planted_events:
+      - event_id: PE_C_03
+        description: Breathless lying flat with heart failure - RED FLAG
+        flag_level: red
+        flag_rule: DEMO_RF_03
+        slot: breathless_lying_flat
+        expected_turn_to_flag: 1
+      - event_id: PE_C_04
+        description: Weight gain 1.9 kg over 3 days (yellow - DEMO_YF_01)
+        flag_level: yellow
+        flag_rule: DEMO_YF_01
+        slot: weight_kg
+        expected_turn_to_flag: 1
+
+  - day: 13
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 20   # improvement
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 71.8
+      salt_adherence: true
+      nutrition_summary: excellent
+      patient_concerns: []
+    planted_events:
+      - event_id: PE_C_05
+        description: Salt adherence and steps up - GREEN
+        flag_level: green
+        flag_rule: DEMO_GF_01
+        slot: salt_adherence
+        expected_turn_to_flag: 1
+
+  - day: 14
+    slots:
+      chest_pain: false
+      breathlessness: false
+      recent_fall: false
+      severe_dizziness_fainting: false
+      med_taken_today_morning: true
+      med_taken_today_evening: true
+      side_effects: []
+      sleep_hours: 7.0
+      activity_minutes: 20
+      mood_wellbeing: 7
+      hydration_glasses: 6
+      weight_kg: 71.6
+      salt_adherence: true
+      nutrition_summary: good
+      patient_concerns: ["want to ask doctor about the swelling episode"]
+    planted_events: []
