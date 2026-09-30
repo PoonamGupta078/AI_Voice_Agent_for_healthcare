@@ -60,7 +60,7 @@ if completed:
     llm_key = os.environ.get("GOOGLE_API_KEY", "")
     if llm_key:
         from careloop.providers.google_llm import GoogleLLMClient
-        llm = GoogleLLMClient(model_name="gemini-2.5-flash")
+        llm = GoogleLLMClient(model_name="gemini-3.5-flash-lite")
     else:
         llm = MockLLMClient()
     
@@ -78,69 +78,53 @@ if completed:
     col3.metric("Flags Raised", len(flags_from_session))
     col4.metric("Total Turns", summary.get("turns", 0))
 
-else:
-    # ══ PERSONA GROUND TRUTH MODE ══
-    st.info("ℹ️ No live session yet. Showing report from persona ground truth. Complete a Live Session to see a real report.")
-    
-    profiles_raw = load_yaml(os.path.join(BASE, "profiles.yaml"))
-    persona_options = {p["name"]: pid for pid, p in profiles_raw.items()}
-    selected_name = st.sidebar.selectbox("Select Patient", list(persona_options.keys()))
-    selected_pid = persona_options[selected_name]
-    profile = profiles_raw[selected_pid]
-
-    truth_path = os.path.join(BASE, f"{selected_pid}_truth.yaml")
-    truth = load_yaml(truth_path)
-    day_options = list(range(1, len(truth["days"]) + 1))
-    selected_day = st.sidebar.selectbox("Select Day", day_options, index=len(day_options) - 1)
-    day_data = truth["days"][selected_day - 1]
-    fact_sheet = day_data["slots"]
-    planted_events = day_data.get("planted_events", [])
-
-    st.sidebar.markdown("---")
-    st.sidebar.info(f"📅 Appointment: Day {profile.get('upcoming_appointment_day', 'N/A')}")
-
-    # Build synthetic session from ground truth
-    slots = load_slots()
-    store = SlotStore(slots)
-    evidence_store = EvidenceStore()
-
-    for slot_id, val in fact_sheet.items():
-        spec = store.catalogue.get(slot_id)
-        if spec is None:
-            continue
-        if isinstance(val, bool):
-            status = SlotStatus.answered if val else SlotStatus.denied
-        elif val is not None:
-            status = SlotStatus.answered
+elif "session" in st.session_state:
+    live_session = st.session_state.session
+    if live_session.session_closed:
+        st.info("Session has ended. Please navigate back to the Live Session page to close it properly.")
+        st.stop()
+    else:
+        st.warning("⚠️ The check-in session is still ongoing. This is a partial report based on what has been collected so far.")
+        selected_pid = live_session.patient_id
+        profile = live_session.profile
+        store = live_session.slot_store
+        evidence_store = live_session.evidence_store
+        flags_from_session = live_session.flags_raised
+        turns = live_session.turns
+        summary = {"questions_asked": live_session.questions_asked, "turns": len(turns)}
+        
+        with st.expander("💬 Conversation So Far", expanded=False):
+            for turn in turns:
+                role = turn.get("role", "user")
+                content = turn.get("content", "")
+                if role == "assistant":
+                    st.markdown(f"🤖 **CareLoop:** {content}")
+                else:
+                    st.markdown(f"👤 **Patient:** {content}")
+                st.markdown("---")
+        
+        llm_key = os.environ.get("GOOGLE_API_KEY", "")
+        if llm_key:
+            from careloop.providers.google_llm import GoogleLLMClient
+            llm = GoogleLLMClient(model_name="gemini-3.5-flash-lite")
         else:
-            continue
-        quote = f"Patient reported: {val}"
-        store.update(slot_id, status, val, 0.9, "t1", quote)
-        evidence_store.add(selected_pid, f"day{selected_day}", slot_id, val, quote, "patient_statement", "t1")
+            llm = MockLLMClient()
+        
+        builder = ReportBuilder(llm)
+        today = date.today()
+        report = builder.build(store, flags_from_session, {}, evidence_store, selected_pid, (today, today))
+        
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Slot Coverage", f"{store.coverage_rate():.0%}")
+        col2.metric("Questions Asked", summary.get("questions_asked", 0))
+        col3.metric("Flags Raised", len(flags_from_session))
+        col4.metric("Turns", summary.get("turns", 0))
 
-    engine = FlagEngine()
-    flags_rt = engine.evaluate(store, "realtime", f"day{selected_day}")
-    flags_eos = engine.evaluate(store, "end_of_session", f"day{selected_day}")
-    flags_from_session = flags_rt + flags_eos
-
-    analyzer = TrendAnalyzer()
-    history = []
-    for i, d in enumerate(truth["days"][:selected_day]):
-        history.append({"date": date(2026, 9, i + 1), "slots": d["slots"]})
-    trends = analyzer.compute_all(history, profile.get("baselines", {}))
-
-    llm = MockLLMClient()
-    builder = ReportBuilder(llm)
-    report = builder.build(
-        store, flags_from_session, trends, evidence_store, selected_pid,
-        (date(2026, 9, 1), date(2026, 9, selected_day))
-    )
-    
-    if planted_events:
-        with st.expander("🔬 Ground Truth Planted Events (Evaluation Only)"):
-            for ev in planted_events:
-                badge = {"red": "🔴", "yellow": "🟡", "green": "🟢"}.get(ev["flag_level"], "⚪")
-                st.markdown(f"{badge} **{ev['event_id']}**: {ev['description']} (Rule: `{ev['flag_rule']}`)")
+else:
+    st.info("No session data found. Please start a Live Session to generate a real report.")
+    if st.button("▶️ Go to Live Session"):
+        st.switch_page("pages/5_Live_Session.py")
+    st.stop()
 
 
 # ─── RENDER REPORT (shared between live and static modes) ──────────────────────

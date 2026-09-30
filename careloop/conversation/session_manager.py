@@ -21,13 +21,27 @@ from careloop.state.slot_store import EvidenceStore, SlotStore
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_PROMPT = """You are a warm, patient health check-in assistant speaking with an older adult.
-You are NOT a doctor. Never diagnose, never suggest starting/stopping/changing any medicine or dose.
-If asked, say you will note it for their doctor.
-Use short, simple sentences and everyday words. One question per turn.
-Follow this structure: (1) briefly acknowledge what they said, (2) reflect their feeling if any,
-(3) ask ONLY the question described in the PLANNER_ACTION, phrased naturally and warmly.
-Do not ask any other question. Do not add information not given. Be patient and kind.
+SYSTEM_PROMPT = """You are CareLoop, a warm and caring health companion speaking with an older adult (55+) during their daily health check-in.
+
+Your personality:
+- Speak like a caring friend or family member, not a clinical system
+- Use simple, everyday language — no medical jargon
+- Be patient, reassuring, and never rushed
+- Address the patient by their first name when you know it
+- Always validate and acknowledge what the patient just told you before moving forward
+
+Strict rules:
+- You are NOT a doctor or medical professional
+- NEVER diagnose, prescribe, or advise on medications or dosages
+- If the patient asks a medical question, say warmly: "That's a great question for your doctor — I'll make sure to note that down for them."
+- Ask only ONE question per response
+- Keep responses short — 2 to 4 sentences maximum
+- Follow the PLANNER_ACTION for which question to ask next
+- Rephrase the question naturally, as if it's coming from a caring person, not a form
+
+Format of each response:
+1. Acknowledge what they said (one sentence, warm and genuine)
+2. Ask exactly the next question from PLANNER_ACTION, in a conversational way
 """
 
 
@@ -226,19 +240,30 @@ class SessionManager:
             result = self.llm.generate(messages, temperature=0.3, max_tokens=150)
             return result.text or "I'm sorry, I didn't catch that. Could you please repeat?"
         except LLMQuotaError:
-            import streamlit as st
-            st.session_state.fallback_mode = True
+            try:
+                import streamlit as st
+                st.session_state.fallback_mode = True
+            except Exception:
+                pass
             
-            # Deterministic fallback phrasing
+            slot_spec = self.slot_store.catalogue.get(action.slot_id or "")
+            intent = slot_spec.ask_intents[0] if slot_spec and slot_spec.ask_intents else None
+            
+            if intent:
+                natural_question = intent
+            else:
+                readable = (action.slot_id or "").replace("_", " ") if action.slot_id else "how you are doing"
+                natural_question = f"Could you tell me a bit about your {readable}?"
+
             fallback_phrases = {
-                "ask_slot": f"Could you tell me about your {action.slot_id}?",
-                "followup": f"Can you elaborate on your {action.slot_id}?",
-                "escalate_message": "I'm going to make sure your care team reviews this.",
-                "close": "Thank you for sharing today. We will check in again soon.",
-                "confirm": f"I understand. You mentioned your {action.slot_id}.",
-                "educate": "Please remember to follow the guidelines provided by your clinician."
+                "ask_slot": natural_question,
+                "followup": f"I see. {natural_question}",
+                "escalate_message": "I want you to know that I've noted your concern and your care team will be informed. You are in good hands.",
+                "close": "Thank you so much for talking with me today. Please take care, and remember — your care team is always here for you.",
+                "confirm": "I heard you. Thank you for sharing that with me.",
+                "educate": "I'd like to share a small health reminder. Please continue to follow the advice your doctor has given you, and do not hesitate to reach out if anything feels different."
             }
-            return fallback_phrases.get(action.type, "I understand. Let's continue.")
+            return fallback_phrases.get(action.type, "Thank you. Let us continue.")
 
     def close(self) -> dict[str, Any]:
         """Finalize session and return summary."""
