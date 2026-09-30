@@ -3,11 +3,10 @@ Lexical Safety Net (M3)
 Scans raw text for critical phrases before extraction.
 Fires even when extractor fails.
 """
-import re
-import yaml
 import os
-from typing import Dict, List, Optional
+import re
 
+import yaml
 
 LEXICAL_CONFIG_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
@@ -15,7 +14,7 @@ LEXICAL_CONFIG_PATH = os.path.join(
 )
 
 
-def _load_config() -> Dict:
+def _load_config() -> dict:
     if os.path.exists(LEXICAL_CONFIG_PATH):
         with open(LEXICAL_CONFIG_PATH) as f:
             return yaml.safe_load(f)
@@ -66,9 +65,9 @@ class LexicalSafetyNet:
                 self.phrases[category] = []
             self.phrases[category].extend(patterns)
 
-    def scan(self, text: str) -> Dict[str, bool]:
+    def scan(self, text: str) -> dict[str, bool]:
         """Returns dict of category -> True if matched."""
-        results: Dict[str, bool] = {}
+        results: dict[str, bool] = {}
         text_lower = text.lower()
         for category, patterns in self.phrases.items():
             for pattern in patterns:
@@ -82,5 +81,5 @@ class LexicalSafetyNet:
         matches = self.scan(text)
         return bool(matches)
 
-    def get_triggered_categories(self, text: str) -> List[str]:
+    def get_triggered_categories(self, text: str) -> list[str]:
         return list(self.scan(text).keys())

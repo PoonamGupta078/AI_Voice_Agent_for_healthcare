@@ -1,5 +1,5 @@
-import pytest
-from careloop.config import load_slots, load_flag_rules
+from careloop.config import load_flag_rules, load_slots
+
 
 def test_load_slots():
     slots = load_slots()

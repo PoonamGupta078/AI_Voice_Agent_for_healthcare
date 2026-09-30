@@ -2,13 +2,13 @@
 Trend Analyzer (M4)
 Computes baseline, delta, 3-day rolling mean, 7-day slope, streaks, adherence %, etc.
 """
-import math
 from datetime import date
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
+
 from careloop.models.data_models import TrendFinding
 
 
-def _slope(series: List[Tuple[date, float]]) -> Optional[float]:
+def _slope(series: list[tuple[date, float]]) -> float | None:
     """Compute least-squares slope for a series of (date, value) pairs."""
     if len(series) < 2:
         return None
@@ -24,7 +24,7 @@ def _slope(series: List[Tuple[date, float]]) -> Optional[float]:
     return num / den
 
 
-def _rolling_mean(values: List[float], window: int = 3) -> Optional[float]:
+def _rolling_mean(values: list[float], window: int = 3) -> float | None:
     if not values:
         return None
     recent = values[-window:]
@@ -40,11 +40,11 @@ class TrendAnalyzer:
     def compute_metric(
         self,
         metric: str,
-        series_data: List[Tuple[date, Optional[float]]],
-        baseline: Optional[float] = None,
+        series_data: list[tuple[date, float | None]],
+        baseline: float | None = None,
         window_days: int = 7,
         tolerance: float = 0.05,
-        evidence_ids: Optional[List[str]] = None,
+        evidence_ids: list[str] | None = None,
     ) -> TrendFinding:
         clean = [(d, v) for d, v in series_data if v is not None]
 
@@ -100,9 +100,9 @@ class TrendAnalyzer:
 
     def compute_adherence(
         self,
-        taken_list: List[Optional[bool]],
+        taken_list: list[bool | None],
         window: int = 7,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Compute medication adherence metrics."""
         recent = taken_list[-window:]
         taken = sum(1 for v in recent if v is True)
@@ -127,14 +127,14 @@ class TrendAnalyzer:
 
     def compute_all(
         self,
-        history: List[Dict[str, Any]],   # list of {day, slots} dicts
-        baselines: Dict[str, float],
-    ) -> Dict[str, Any]:
+        history: list[dict[str, Any]],   # list of {day, slots} dicts
+        baselines: dict[str, float],
+    ) -> dict[str, Any]:
         """
         Compute trends for all standard metrics from a history of sessions.
         Returns a dict of metric -> TrendFinding or adherence dict.
         """
-        results: Dict[str, Any] = {}
+        results: dict[str, Any] = {}
         metrics = ["weight_kg", "sleep_hours", "activity_minutes", "mood_wellbeing",
                    "hydration_glasses", "glucose_reading"]
 

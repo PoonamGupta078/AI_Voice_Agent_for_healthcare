@@ -14,10 +14,13 @@ format:
 	ruff format .
 
 sim:
-	python -m eval.simulator.run
+	python -m eval.simulator.run --provider mock
 
 eval:
-	python -m eval.run_eval
+	python -m eval.run_eval --provider mock
+
+eval-real-subset:
+	python -m eval.run_eval --provider google --patients 1 --days 1 --seed 42
 
 dashboard:
 	streamlit run dashboard/app.py

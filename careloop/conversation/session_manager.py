@@ -2,21 +2,21 @@
 Session Manager (M2/M8)
 Orchestrates a full check-in session: planner -> responder -> extractor -> verifier -> flag engine.
 """
-import uuid
 import logging
 import time
+import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore, EvidenceStore
-from careloop.planner.planner import QuestionPlanner
 from careloop.extraction.extractor import ExtractorLLMClient
 from careloop.extraction.verifier import Verifier
 from careloop.flags.engine import FlagEngine
 from careloop.flags.lexical_net import LexicalSafetyNet
-from careloop.providers.base import LLMClient
-from careloop.models.data_models import SlotStatus, FlagEvent
+from careloop.models.data_models import FlagEvent, SlotStatus
+from careloop.planner.planner import QuestionPlanner
+from careloop.providers.base import LLMClient, LLMQuotaError
+from careloop.state.slot_store import EvidenceStore, SlotStore
 
 logger = logging.getLogger(__name__)
 
@@ -39,26 +39,34 @@ class SessionManager:
     def __init__(
         self,
         patient_id: str,
-        profile: Dict[str, Any],
-        llm_client: LLMClient,
+        profile: dict[str, Any],
+        llms: dict[str, LLMClient],
         session_type: str = "daily",
+        skip_verifier: bool = False,
     ):
         self.patient_id = patient_id
         self.profile = profile
         self.session_id = str(uuid.uuid4())[:8]
-        self.llm = llm_client
+        from careloop.providers.mock import MockLLMClient
+        default_mock = MockLLMClient()
+        self.llms = llms
+        self.llm = llms.get("conversation", default_mock)
+        self.skip_verifier = skip_verifier
 
         slots = load_slots()
         self.slot_store = SlotStore(slots)
         self.evidence_store = EvidenceStore()
+        # Ensure we pass the conversation LLM to the planner? Wait, QuestionPlanner doesn't take an LLM in the current architecture. Let me check. Ah, QuestionPlanner is rule-based.
         self.planner = QuestionPlanner(slots, session_type)
-        self.extractor = ExtractorLLMClient(llm_client, slots)
+        self.extractor = ExtractorLLMClient(self.llms.get("extractor", default_mock), slots)
+        
+        # If Verifier requires LLM, pass it here, but current Verifier is rule-based or MockLLM based.
         self.verifier = Verifier()
         self.flag_engine = FlagEngine()
         self.lexical_net = LexicalSafetyNet()
 
-        self.turns: List[Dict] = []
-        self.flags_raised: List[FlagEvent] = []
+        self.turns: list[dict] = []
+        self.flags_raised: list[FlagEvent] = []
         self.questions_asked: int = 0
         self.session_closed: bool = False
 
@@ -80,7 +88,7 @@ class SessionManager:
         })
         return greeting
 
-    def turn(self, patient_text: str) -> Dict[str, Any]:
+    def turn(self, patient_text: str) -> dict[str, Any]:
         """
         Process one patient turn. Returns dict with agent reply, flags, planner action.
         """
@@ -115,7 +123,11 @@ class SessionManager:
         ext_latency = int((time.time() - t_ext) * 1000)
 
         # 4. Verify updates
-        verified = self.verifier.verify(updates, self.turns[-4:])
+        if not self.skip_verifier:
+            verified = self.verifier.verify(updates, self.turns[-4:])
+        else:
+            from careloop.extraction.verifier import VerifiedUpdate
+            verified = [VerifiedUpdate(update=u, status="supported", reason="Skipped verifier") for u in updates]
 
         # 5. Update slot store with verified updates
         ev_ids = []
@@ -209,10 +221,26 @@ class SessionManager:
             *self.turns[-6:],
             {"role": "system", "content": f"PLANNER_ACTION: {action_desc}"},
         ]
-        result = self.llm.generate(messages, temperature=0.3, max_tokens=150)
-        return result.text or "I'm sorry, I didn't catch that. Could you please repeat?"
+        
+        try:
+            result = self.llm.generate(messages, temperature=0.3, max_tokens=150)
+            return result.text or "I'm sorry, I didn't catch that. Could you please repeat?"
+        except LLMQuotaError:
+            import streamlit as st
+            st.session_state.fallback_mode = True
+            
+            # Deterministic fallback phrasing
+            fallback_phrases = {
+                "ask_slot": f"Could you tell me about your {action.slot_id}?",
+                "followup": f"Can you elaborate on your {action.slot_id}?",
+                "escalate_message": "I'm going to make sure your care team reviews this.",
+                "close": "Thank you for sharing today. We will check in again soon.",
+                "confirm": f"I understand. You mentioned your {action.slot_id}.",
+                "educate": "Please remember to follow the guidelines provided by your clinician."
+            }
+            return fallback_phrases.get(action.type, "I understand. Let's continue.")
 
-    def close(self) -> Dict[str, Any]:
+    def close(self) -> dict[str, Any]:
         """Finalize session and return summary."""
         # End-of-session flags
         end_flags = self.flag_engine.evaluate(

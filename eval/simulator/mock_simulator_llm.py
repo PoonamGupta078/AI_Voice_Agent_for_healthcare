@@ -1,10 +1,9 @@
 """
 Mock LLM Client that returns scripted responses for simulator testing (deterministic/offline).
 """
-import json
-from typing import Any, Dict, List, Optional
-from careloop.providers.base import LLMClient, LLMResult
+from typing import Any
 
+from careloop.providers.base import LLMClient, LLMResult
 
 MOCK_PATIENT_RESPONSES = [
     "Yes, I took my morning tablet.",
@@ -27,9 +26,9 @@ class MockSimulatorLLMClient(LLMClient):
 
     def generate(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         *,
-        json_schema: Optional[Dict[str, Any]] = None,
+        json_schema: dict[str, Any] | None = None,
         temperature: float = 0.0,
         max_tokens: int = 1000,
         stream: bool = False,

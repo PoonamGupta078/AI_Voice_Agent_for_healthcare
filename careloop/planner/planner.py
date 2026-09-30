@@ -2,19 +2,20 @@
 Question Planner (M2 - Appendix C)
 Deterministic: decides WHAT to ask. LLM only decides HOW to say it.
 """
-import yaml
 import os
-from typing import Any, Dict, List, Optional
-from careloop.models.data_models import SlotSpec, SlotStatus, PlannerAction
-from careloop.state.slot_store import SlotStore
+from typing import Any
 
+import yaml
+
+from careloop.models.data_models import PlannerAction, SlotSpec, SlotStatus
+from careloop.state.slot_store import SlotStore
 
 PLANNER_CONFIG_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "planner.yaml"
 )
 
 
-def _load_planner_config() -> Dict[str, Any]:
+def _load_planner_config() -> dict[str, Any]:
     if os.path.exists(PLANNER_CONFIG_PATH):
         with open(PLANNER_CONFIG_PATH) as f:
             return yaml.safe_load(f)
@@ -30,26 +31,26 @@ class QuestionPlanner:
     Selects the next slot to ask based on priority score.
     """
 
-    def __init__(self, slot_catalogue: List[SlotSpec], session_type: str = "daily"):
+    def __init__(self, slot_catalogue: list[SlotSpec], session_type: str = "daily"):
         self.catalogue = {s.slot_id: s for s in slot_catalogue}
         self.session_type = session_type
         self.cfg = _load_planner_config()
         self.w = self.cfg.get("weights", {})
         budgets = self.cfg.get("budgets", {})
         self.budget = budgets.get(session_type, 10)
-        self._followup_queue: List[str] = []
+        self._followup_queue: list[str] = []
         self._pending_interrupt: bool = False
         self._concerns_asked: bool = False
 
     def set_interrupt(self) -> None:
         self._pending_interrupt = True
 
-    def queue_followups(self, followup_ids: List[str]) -> None:
+    def queue_followups(self, followup_ids: list[str]) -> None:
         for fid in followup_ids:
             if fid not in self._followup_queue:
                 self._followup_queue.append(fid)
 
-    def _score(self, slot: SlotSpec, store: SlotStore, trends: Optional[Dict] = None) -> float:
+    def _score(self, slot: SlotSpec, store: SlotStore, trends: dict | None = None) -> float:
         state = store.get(slot.slot_id)
         tier_weights = {1: 3.0, 2: 2.0, 3: 1.0}
         score = self.w.get("tier", 3.0) * tier_weights.get(slot.tier, 1.0)
@@ -64,8 +65,8 @@ class QuestionPlanner:
         self,
         store: SlotStore,
         questions_asked: int,
-        profile: Optional[Dict] = None,
-        trends: Optional[Dict] = None,
+        profile: dict | None = None,
+        trends: dict | None = None,
     ) -> PlannerAction:
         # 1. Handle interrupt (red flag)
         if self._pending_interrupt:

@@ -2,15 +2,17 @@
 Evidence-Grounded Report Builder (M5)
 Claim Builder -> LLM Verbalizer -> Report Verifier -> ClinicianReport
 """
-import re
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional
-from careloop.models.data_models import (
-    ReportClaim, ClinicianReport, FlagEvent, SlotStatus
-)
-from careloop.state.slot_store import SlotStore, EvidenceStore
-from careloop.providers.base import LLMClient
+from datetime import datetime
+from typing import Any
 
+from careloop.models.data_models import (
+    ClinicianReport,
+    FlagEvent,
+    ReportClaim,
+    SlotStatus,
+)
+from careloop.providers.base import LLMClient
+from careloop.state.slot_store import EvidenceStore, SlotStore
 
 DISCLAIMER = (
     "Automated summary from patient-reported conversations. "
@@ -25,12 +27,12 @@ class ClaimBuilder:
     def build(
         self,
         store: SlotStore,
-        flags: List[FlagEvent],
-        trends: Dict[str, Any],
+        flags: list[FlagEvent],
+        trends: dict[str, Any],
         evidence_store: EvidenceStore,
         patient_id: str,
-    ) -> List[ReportClaim]:
-        claims: List[ReportClaim] = []
+    ) -> list[ReportClaim]:
+        claims: list[ReportClaim] = []
         claim_idx = 0
 
         def new_id():
@@ -147,8 +149,8 @@ class ReportVerbalizer:
     def __init__(self, llm_client: LLMClient):
         self.llm = llm_client
 
-    def verbalize(self, claims: List[ReportClaim]) -> Dict[str, str]:
-        sentences: Dict[str, str] = {}
+    def verbalize(self, claims: list[ReportClaim]) -> dict[str, str]:
+        sentences: dict[str, str] = {}
         for claim in claims:
             try:
                 sentence = self._verbalize_one(claim)
@@ -183,7 +185,7 @@ class ReportVerbalizer:
 class ReportVerifier:
     """Verifies that sentences are consistent with their claim facts."""
 
-    def verify(self, claims: List[ReportClaim], sentences: Dict[str, str]) -> Dict[str, Any]:
+    def verify(self, claims: list[ReportClaim], sentences: dict[str, str]) -> dict[str, Any]:
         failures = []
         for claim in claims:
             sentence = sentences.get(claim.claim_id, "")
@@ -212,8 +214,8 @@ class ReportBuilder:
     def build(
         self,
         store: SlotStore,
-        flags: List[FlagEvent],
-        trends: Dict[str, Any],
+        flags: list[FlagEvent],
+        trends: dict[str, Any],
         evidence_store: EvidenceStore,
         patient_id: str,
         period: tuple,
@@ -234,7 +236,7 @@ class ReportBuilder:
                     sentences[cid] = self.verbalizer._fallback(claim)
 
         # 4. Organize into sections
-        sections: Dict[str, List[Dict]] = {
+        sections: dict[str, list[dict]] = {
             "overview": [], "red": [], "yellow": [], "green": [],
             "trends": [], "concerns": [], "followup": [], "gaps": [],
         }

@@ -2,18 +2,18 @@
 Session State and Slot Store (M2)
 Four-state slot tracking: not_asked / asked_unclear / answered / denied / declined
 """
-import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-from careloop.models.data_models import SlotState, SlotStatus, SlotSpec, EvidenceRecord, PlannerAction
+from typing import Any
+
+from careloop.models.data_models import EvidenceRecord, SlotSpec, SlotState, SlotStatus
 
 
 class SlotStore:
     """Manages the four-state slot store for a session."""
 
-    def __init__(self, slot_catalogue: List[SlotSpec]):
-        self.catalogue: Dict[str, SlotSpec] = {s.slot_id: s for s in slot_catalogue}
-        self.states: Dict[str, SlotState] = {
+    def __init__(self, slot_catalogue: list[SlotSpec]):
+        self.catalogue: dict[str, SlotSpec] = {s.slot_id: s for s in slot_catalogue}
+        self.states: dict[str, SlotState] = {
             s.slot_id: SlotState(slot_id=s.slot_id) for s in slot_catalogue
         }
 
@@ -21,8 +21,8 @@ class SlotStore:
         return self.states.get(slot_id, SlotState(slot_id=slot_id))
 
     def update(self, slot_id: str, status: SlotStatus, value: Any = None,
-               confidence: float = 1.0, source_turn_id: Optional[str] = None,
-               quote: Optional[str] = None, unclear_reason: Optional[str] = None) -> bool:
+               confidence: float = 1.0, source_turn_id: str | None = None,
+               quote: str | None = None, unclear_reason: str | None = None) -> bool:
         """Returns True if state was actually updated."""
         if slot_id not in self.states:
             self.states[slot_id] = SlotState(slot_id=slot_id)
@@ -52,10 +52,10 @@ class SlotStore:
             if self.states[slot_id].status == SlotStatus.not_asked:
                 self.states[slot_id].status = SlotStatus.asked_unclear
 
-    def get_required_slots(self) -> List[SlotSpec]:
+    def get_required_slots(self) -> list[SlotSpec]:
         return [s for s in self.catalogue.values() if s.frequency != "conditional"]
 
-    def get_unanswered_required(self) -> List[SlotSpec]:
+    def get_unanswered_required(self) -> list[SlotSpec]:
         return [
             s for s in self.get_required_slots()
             if self.states[s.slot_id].status in (SlotStatus.not_asked, SlotStatus.asked_unclear)
@@ -71,7 +71,7 @@ class SlotStore:
         )
         return answered / len(required)
 
-    def all_states(self) -> Dict[str, SlotState]:
+    def all_states(self) -> dict[str, SlotState]:
         return dict(self.states)
 
 
@@ -79,10 +79,10 @@ class EvidenceStore:
     """Stores evidence records linking slot values to transcript turns."""
 
     def __init__(self):
-        self.records: List[EvidenceRecord] = []
+        self.records: list[EvidenceRecord] = []
 
     def add(self, patient_id: str, session_id: str, slot_id: str, value: Any,
-            quote: Optional[str], source_type: str, turn_id: Optional[str] = None) -> str:
+            quote: str | None, source_type: str, turn_id: str | None = None) -> str:
         ev_id = f"E{len(self.records) + 1}"
         self.records.append(EvidenceRecord(
             evidence_id=ev_id,
@@ -97,8 +97,8 @@ class EvidenceStore:
         ))
         return ev_id
 
-    def get_by_id(self, ev_id: str) -> Optional[EvidenceRecord]:
+    def get_by_id(self, ev_id: str) -> EvidenceRecord | None:
         return next((r for r in self.records if r.evidence_id == ev_id), None)
 
-    def get_for_slot(self, slot_id: str) -> List[EvidenceRecord]:
+    def get_for_slot(self, slot_id: str) -> list[EvidenceRecord]:
         return [r for r in self.records if r.slot_id == slot_id]

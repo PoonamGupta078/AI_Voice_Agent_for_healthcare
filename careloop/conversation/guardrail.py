@@ -2,10 +2,10 @@
 Output Guardrail (M9)
 Blocks or rewrites agent replies containing diagnosis, dose advice, lab interpretation.
 """
-import re
-import yaml
 import os
-from typing import Optional, Tuple
+import re
+
+import yaml
 
 GUARDRAILS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
@@ -30,7 +30,7 @@ class Guardrail:
         self.deferral = cfg.get("deferral_message",
                                 "I'll note that for your doctor.")
 
-    def check(self, text: str) -> Tuple[bool, Optional[str], str]:
+    def check(self, text: str) -> tuple[bool, str | None, str]:
         """
         Returns (safe, reason_if_blocked, text_to_use).
         If blocked: text_to_use is the fallback.

@@ -3,10 +3,10 @@ Evaluation Metrics (M6)
 Compute: coverage, information gain per question (IG), unnecessary question rate (UQR),
 extraction F1, pertinent-negative accuracy, unsupported-claim rate, flag recall/precision.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
-def required_slot_coverage(session_result: Dict[str, Any]) -> float:
+def required_slot_coverage(session_result: dict[str, Any]) -> float:
     """Fraction of required slots that were answered or denied."""
     return session_result.get("slot_coverage", 0.0)
 
@@ -26,10 +26,10 @@ def unnecessary_question_rate(repeated_questions: int, total_questions: int) -> 
 
 
 def extraction_f1(
-    predicted: Dict[str, Any],
-    ground_truth: Dict[str, Any],
+    predicted: dict[str, Any],
+    ground_truth: dict[str, Any],
     numeric_tolerance: float = 0.1,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Compute P, R, F1 for slot extraction vs ground truth."""
     tp = fp = fn = 0
     for slot_id, true_val in ground_truth.items():
@@ -55,9 +55,9 @@ def extraction_f1(
 
 
 def flag_recall_precision(
-    raised_flags: List[str],
-    planted_events: List[Dict[str, Any]],
-) -> Dict[str, float]:
+    raised_flags: list[str],
+    planted_events: list[dict[str, Any]],
+) -> dict[str, float]:
     """Compute flag recall and precision vs planted events."""
     planted_ids = {ev["event_id"] for ev in planted_events}
     planted_levels = {ev["event_id"]: ev["flag_level"] for ev in planted_events}
@@ -71,7 +71,7 @@ def flag_recall_precision(
     return {"precision": precision, "recall": recall, "tp": tp, "fp": fp, "fn": fn}
 
 
-def unsupported_claim_rate(claims: List[Dict], verified_claims: List[Dict]) -> float:
+def unsupported_claim_rate(claims: list[dict], verified_claims: list[dict]) -> float:
     """Fraction of claims not supported by evidence."""
     if not claims:
         return 0.0

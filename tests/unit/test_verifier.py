@@ -2,6 +2,7 @@
 Unit tests for Verifier (M2)
 """
 import pytest
+
 from careloop.extraction.extractor import SlotUpdate
 from careloop.extraction.verifier import Verifier
 from careloop.models.data_models import SlotStatus

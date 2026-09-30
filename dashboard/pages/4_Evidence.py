@@ -1,15 +1,18 @@
 """
 Page 4: Evidence — click a claim to see the transcript evidence
 """
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
 
 import streamlit as st
 import yaml
-from datetime import date
+
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore, EvidenceStore
 from careloop.models.data_models import SlotStatus
+from careloop.state.slot_store import EvidenceStore, SlotStore
 
 st.set_page_config(page_title="Evidence — CareLoop", page_icon="🔍", layout="wide")
 st.title("🔍 Evidence Explorer")
@@ -97,6 +100,7 @@ for slot_id, state in store.all_states().items():
     })
 
 import pandas as pd
+
 df = pd.DataFrame(states_data)
 status_colors = {"answered": "✅", "denied": "❌", "not_asked": "⬜", "asked_unclear": "❓"}
 df["Status"] = df["Status"].map(lambda x: f"{status_colors.get(x, '')} {x}")

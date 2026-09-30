@@ -3,8 +3,6 @@ Verifier (M2 - Section 5.4)
 Two-layer verification: rule layer + optional model layer.
 Unsupported slot updates are rejected.
 """
-import re
-from typing import List, Optional
 from careloop.extraction.extractor import SlotUpdate
 from careloop.models.data_models import SlotStatus
 
@@ -29,7 +27,7 @@ class Verifier:
             "eleven": 11, "twelve": 12,
         }
 
-    def _quote_in_transcript(self, quote: str, turns: List[dict]) -> bool:
+    def _quote_in_transcript(self, quote: str, turns: list[dict]) -> bool:
         """Check if quote (or fuzzy match) appears in any patient turn."""
         if not quote:
             return False
@@ -59,7 +57,7 @@ class Verifier:
         quote_lower = quote.lower()
         return any(neg in quote_lower for neg in self.negation_words)
 
-    def verify(self, updates: List[SlotUpdate], turns: List[dict]) -> List[VerifiedUpdate]:
+    def verify(self, updates: list[SlotUpdate], turns: list[dict]) -> list[VerifiedUpdate]:
         results = []
         for upd in updates:
             # Check confidence

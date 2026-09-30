@@ -3,7 +3,8 @@ Patient Simulator (M1)
 Simulates a patient's responses for a given persona, day, and disclosure policy.
 """
 import random
-from typing import Any, Dict, Optional
+from typing import Any
+
 from careloop.providers.base import LLMClient
 
 
@@ -15,8 +16,8 @@ class PatientSimulator:
 
     def __init__(
         self,
-        persona: Dict[str, Any],
-        fact_sheet: Dict[str, Any],
+        persona: dict[str, Any],
+        fact_sheet: dict[str, Any],
         llm_client: LLMClient,
         disclosure_policy: str = "mixed",
         volunteer_prob: float = 0.7,

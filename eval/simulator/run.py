@@ -2,12 +2,15 @@
 sim_demo: Run a simulated multi-turn conversation for one persona/day.
 Usage: python -m eval.simulator.run
 """
-import os, sys
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import yaml
-from eval.simulator.patient_simulator import PatientSimulator
+
 from eval.simulator.mock_simulator_llm import MockSimulatorLLMClient
+from eval.simulator.patient_simulator import PatientSimulator
 
 
 def load_yaml(path: str) -> dict:

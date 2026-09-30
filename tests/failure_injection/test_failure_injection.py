@@ -2,14 +2,17 @@
 Failure injection tests (M6/M8)
 Test graceful degradation: LLM timeout, malformed JSON, STT failure.
 """
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+
 import pytest
-from typing import Any, Dict, List, Optional
-from careloop.providers.base import LLMClient, LLMResult, STTClient, Transcript
-from careloop.extraction.extractor import ExtractorLLMClient
+
 from careloop.config import load_slots
+from careloop.extraction.extractor import ExtractorLLMClient
+from careloop.providers.base import LLMClient, LLMResult, STTClient, Transcript
 
 
 class TimeoutLLMClient(LLMClient):
@@ -69,7 +72,8 @@ def test_session_manager_handles_empty_input():
     from careloop.providers.mock import MockLLMClient
     profile = {"name": "Test Patient", "age": 65, "conditions": [], "medications": [],
                 "baselines": {}, "language": "en"}
-    session = SessionManager("test_p", profile, MockLLMClient())
+    llms = {"conversation": MockLLMClient(), "extractor": MockLLMClient()}
+    session = SessionManager("test_p", profile, llms)
     session.start()
     # Should not crash on empty input
     result = session.turn("")

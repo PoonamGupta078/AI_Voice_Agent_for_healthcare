@@ -1,13 +1,19 @@
 """
 Unit tests for Report Builder and Verifier (M5)
 """
-import pytest
 from datetime import date, datetime
+
+import pytest
+
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore, EvidenceStore
-from careloop.models.data_models import SlotStatus, FlagEvent
-from careloop.reports.claim_builder import ClaimBuilder, ReportVerifier, ReportVerbalizer, ReportBuilder
+from careloop.models.data_models import FlagEvent, SlotStatus
 from careloop.providers.mock import MockLLMClient
+from careloop.reports.claim_builder import (
+    ClaimBuilder,
+    ReportBuilder,
+    ReportVerifier,
+)
+from careloop.state.slot_store import EvidenceStore, SlotStore
 
 
 @pytest.fixture
@@ -45,8 +51,9 @@ def flags():
 
 @pytest.fixture
 def trends():
-    from careloop.trends.analyzer import TrendAnalyzer
     from datetime import date
+
+    from careloop.trends.analyzer import TrendAnalyzer
     analyzer = TrendAnalyzer()
     series = [(date(2026, 9, i + 1), 70.0 + i * 0.5) for i in range(5)]
     tf = analyzer.compute_metric("weight_kg", series, baseline=70.0)

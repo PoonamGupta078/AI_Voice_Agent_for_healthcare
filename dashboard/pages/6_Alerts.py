@@ -1,16 +1,19 @@
 """
 Page 6: Alerts — escalation events
 """
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
 
 import streamlit as st
 import yaml
-from datetime import date
+
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore
 from careloop.flags.engine import FlagEngine
 from careloop.models.data_models import SlotStatus
+from careloop.state.slot_store import SlotStore
 
 st.set_page_config(page_title="Alerts — CareLoop", page_icon="🚨", layout="wide")
 st.title("🚨 Alerts & Escalations")

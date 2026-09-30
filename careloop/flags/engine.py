@@ -2,14 +2,15 @@
 Deterministic Flag Engine (M3)
 Rules live in config/flag_rules.yaml. Uses safe evaluator — no eval().
 """
-import yaml
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-from simpleeval import SimpleEval, EvalWithCompoundTypes
-from careloop.models.data_models import FlagEvent, SlotStatus
-from careloop.state.slot_store import SlotStore
+from typing import Any
 
+import yaml
+from simpleeval import EvalWithCompoundTypes
+
+from careloop.models.data_models import FlagEvent
+from careloop.state.slot_store import SlotStore
 
 FLAG_RULES_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
@@ -21,12 +22,12 @@ ROUTING_PATH = os.path.join(
 )
 
 
-def _load_rules() -> Dict:
+def _load_rules() -> dict:
     with open(FLAG_RULES_PATH) as f:
         return yaml.safe_load(f)
 
 
-def _load_routing() -> Dict:
+def _load_routing() -> dict:
     if os.path.exists(ROUTING_PATH):
         with open(ROUTING_PATH) as f:
             return yaml.safe_load(f)
@@ -63,7 +64,7 @@ class SlotStateProxy:
 
 class TrendProxy:
     """Provides attribute access to trend findings for expression evaluation."""
-    def __init__(self, trends: Optional[Dict] = None):
+    def __init__(self, trends: dict | None = None):
         self._trends = trends or {}
 
     def __getattr__(self, metric: str):
@@ -79,7 +80,7 @@ class TrendMetricProxy:
 
 
 class LexicalProxy:
-    def __init__(self, lexical_hits: Dict[str, bool]):
+    def __init__(self, lexical_hits: dict[str, bool]):
         self._hits = lexical_hits
 
     @property
@@ -104,9 +105,9 @@ class FlagEngine:
     def __init__(self):
         self.rules_config = _load_rules()
         self.routing = _load_routing()
-        self._raised_flags: Dict[str, str] = {}  # flag_id -> session_id (dedup)
+        self._raised_flags: dict[str, str] = {}  # flag_id -> session_id (dedup)
 
-    def _safe_eval(self, expression: str, names: Dict[str, Any]) -> bool:
+    def _safe_eval(self, expression: str, names: dict[str, Any]) -> bool:
         """Safely evaluate rule expression using simpleeval."""
         try:
             s = EvalWithCompoundTypes(names=names)
@@ -120,10 +121,10 @@ class FlagEngine:
         store: SlotStore,
         scope: str,
         session_id: str,
-        trends: Optional[Dict] = None,
-        lexical_hits: Optional[Dict[str, bool]] = None,
-        evidence_ids: Optional[List[str]] = None,
-    ) -> List[FlagEvent]:
+        trends: dict | None = None,
+        lexical_hits: dict[str, bool] | None = None,
+        evidence_ids: list[str] | None = None,
+    ) -> list[FlagEvent]:
         """
         Evaluate all rules with matching scope.
         Returns list of new FlagEvents.
@@ -180,7 +181,7 @@ class FlagEngine:
 
         return events
 
-    def _build_message(self, rule: Dict, level: str) -> str:
+    def _build_message(self, rule: dict, level: str) -> str:
         templates = {
             "red": "⚠️ Urgent: A potential health concern has been identified. The care team has been informed.",
             "yellow": "📋 Note: A health concern has been flagged for clinical review.",

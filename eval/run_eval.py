@@ -3,33 +3,29 @@ Evaluation Run (M6)
 Runs B0, B1, P (Full CareLoop) systems across personas and volunteer probability sweep.
 Produces CSV and markdown tables in eval/results/.
 """
-import os
-import sys
 import csv
-import json
-import yaml
+import os
 import random
+import sys
 import time
-from datetime import date, datetime
-from typing import Any, Dict, List
+from typing import Any
+
+import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore, EvidenceStore
-from careloop.planner.planner import QuestionPlanner
-from careloop.extraction.extractor import ExtractorLLMClient
 from careloop.extraction.verifier import Verifier
 from careloop.flags.engine import FlagEngine
 from careloop.flags.lexical_net import LexicalSafetyNet
-from careloop.trends.analyzer import TrendAnalyzer
-from careloop.reports.claim_builder import ReportBuilder
+from careloop.planner.planner import QuestionPlanner
 from careloop.providers.mock import MockLLMClient
+from careloop.state.slot_store import EvidenceStore, SlotStore
 from eval.metrics.metrics import (
-    required_slot_coverage, information_gain_per_question,
-    unnecessary_question_rate, extraction_f1, flag_recall_precision
+    extraction_f1,
+    information_gain_per_question,
+    unnecessary_question_rate,
 )
-
 
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
@@ -64,7 +60,7 @@ MOCK_PATIENT_RESPONSES_BY_SLOT = {
 }
 
 
-def mock_patient_response(slot_id: str, fact_sheet: Dict, volunteer_prob: float, rng: random.Random) -> str:
+def mock_patient_response(slot_id: str, fact_sheet: dict, volunteer_prob: float, rng: random.Random) -> str:
     """Generate a mock patient response - supports disclosure policy."""
     true_val = fact_sheet.get(slot_id)
     if true_val is None:
@@ -84,11 +80,11 @@ def mock_patient_response(slot_id: str, fact_sheet: Dict, volunteer_prob: float,
     return str(true_val)
 
 
-def run_careloop_system(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
-                         seed: int, day: int) -> Dict[str, Any]:
+def run_careloop_system(profile: dict, fact_sheet: dict, volunteer_prob: float,
+                         seed: int, day: int, llms: dict[str, Any] = None) -> dict[str, Any]:
     """Run the full CareLoop system (P) for one session."""
     rng = random.Random(seed)
-    llm = MockLLMClient()
+    llms = llms or {"conversation": MockLLMClient(), "extractor": MockLLMClient()}
     slots = load_slots()
     store = SlotStore(slots)
     evidence_store = EvidenceStore()
@@ -175,8 +171,8 @@ def run_careloop_system(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
     }
 
 
-def run_baseline_b0(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
-                     seed: int, day: int) -> Dict[str, Any]:
+def run_baseline_b0(profile: dict, fact_sheet: dict, volunteer_prob: float,
+                     seed: int, day: int) -> dict[str, Any]:
     """B0: Naive LLM - no state tracking, random question order."""
     rng = random.Random(seed)
     slots = load_slots()
@@ -224,8 +220,8 @@ def run_baseline_b0(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
     }
 
 
-def run_baseline_b1(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
-                     seed: int, day: int) -> Dict[str, Any]:
+def run_baseline_b1(profile: dict, fact_sheet: dict, volunteer_prob: float,
+                     seed: int, day: int) -> dict[str, Any]:
     """B1: Checklist LLM - asks slots in fixed order without state tracking."""
     rng = random.Random(seed)
     slots = load_slots()
@@ -273,6 +269,9 @@ def run_baseline_b1(profile: Dict, fact_sheet: Dict, volunteer_prob: float,
 
 def run_eval(mini: bool = False):
     """Run the full evaluation matrix."""
+    global run_eval_llms
+    llms_to_use = globals().get("run_eval_llms", {"conversation": MockLLMClient(), "extractor": MockLLMClient()})
+    
     results = []
     persona_ids = ["persona_a"]  # For mini; full adds persona_b, persona_c
     if not mini:
@@ -297,7 +296,10 @@ def run_eval(mini: bool = False):
                         (run_baseline_b0, "B0"),
                         (run_baseline_b1, "B1"),
                     ]:
-                        row = system_fn(profile, fact_sheet, volunteer_prob, seed, day_idx)
+                        if system_name == "P":
+                            row = system_fn(profile, fact_sheet, volunteer_prob, seed, day_idx, llms=llms_to_use)
+                        else:
+                            row = system_fn(profile, fact_sheet, volunteer_prob, seed, day_idx)
                         row.update({
                             "persona": persona_id,
                             "volunteer_prob": volunteer_prob,
@@ -328,7 +330,7 @@ def run_eval(mini: bool = False):
 
         # Summary by system and volunteer_prob
         from collections import defaultdict
-        agg: Dict[str, Dict[float, List]] = defaultdict(lambda: defaultdict(list))
+        agg: dict[str, dict[float, list]] = defaultdict(lambda: defaultdict(list))
         for row in results:
             agg[row["system"]][row["volunteer_prob"]].append(row)
 
@@ -361,6 +363,32 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--mini", action="store_true", help="Run mini evaluation only")
+    parser.add_argument("--provider", type=str, default="mock", help="Provider (mock or google)")
+    parser.add_argument("--patients", type=int, default=3, help="Number of patients to evaluate")
+    parser.add_argument("--days", type=int, default=3, help="Number of days to evaluate")
+    parser.add_argument("--seed", type=int, default=42, help="Seed to use for single run")
     args = parser.parse_args()
-    print(f"Running {'mini' if args.mini else 'full'} evaluation...")
+    
+    llms = {}
+    if args.provider == "google":
+        from careloop.providers.google_llm import GoogleLLMClient
+        # Budget warning for google provider
+        estimated_calls = args.patients * args.days * 1 * 12 * 2  # up to 12 turns, 2 calls per turn (conversation + extractor)
+        print(f"⚠️ WARNING: Running real evaluation against {args.provider}.")
+        print(f"⚠️ Estimated API calls: ~{estimated_calls}")
+        if estimated_calls > 15:
+            print("⚠️ This might exceed your free tier quota (20/day)!")
+        print("Starting in 3 seconds...")
+        time.sleep(3)
+        llms = {
+            "conversation": GoogleLLMClient(model_name="gemini-2.5-flash-lite"),
+            "extractor": GoogleLLMClient(model_name="gemini-2.5-flash-lite")
+        }
+    else:
+        llms = {"conversation": MockLLMClient(), "extractor": MockLLMClient()}
+        
+    global run_eval_llms
+    run_eval_llms = llms
+    
+    print(f"Running {'mini' if args.mini else 'full'} evaluation with {args.provider} provider...")
     run_eval(mini=args.mini)

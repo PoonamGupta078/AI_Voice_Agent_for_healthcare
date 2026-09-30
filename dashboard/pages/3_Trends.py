@@ -1,14 +1,17 @@
 """
 Page 3: Trends — charts for all metrics over 14 days
 """
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from datetime import date
+
+import altair as alt
+import pandas as pd
 import streamlit as st
 import yaml
-import pandas as pd
-import altair as alt
-from datetime import date
 
 st.set_page_config(page_title="Trends — CareLoop", page_icon="📈", layout="wide")
 st.title("📈 Health Trends")
@@ -47,7 +50,7 @@ METRICS = {
     "glucose_reading": "Glucose (mg/dL)",
 }
 
-metric_options = [m for m in METRICS.keys() if m in df.columns]
+metric_options = [m for m in METRICS if m in df.columns]
 selected_metric = st.selectbox("Metric", metric_options, format_func=lambda x: METRICS.get(x, x))
 
 if selected_metric and selected_metric in df.columns:
@@ -79,9 +82,9 @@ if selected_metric and selected_metric in df.columns:
 
 # Summary table
 st.markdown("### 📊 14-Day Summary Table")
-display_cols = ["day"] + [m for m in METRICS.keys() if m in df.columns]
+display_cols = ["day"] + [m for m in METRICS if m in df.columns]
 st.dataframe(df[display_cols].style.highlight_max(
-    subset=[m for m in METRICS.keys() if m in df.columns and df[m].dtype != object], color="#ffcccc"
+    subset=[m for m in METRICS if m in df.columns and df[m].dtype != object], color="#ffcccc"
 ), use_container_width=True)
 
 # Adherence

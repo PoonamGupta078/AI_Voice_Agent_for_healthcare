@@ -2,11 +2,12 @@
 Safety tests for Flag Engine and Lexical Net (M3)
 """
 import pytest
+
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore
 from careloop.flags.engine import FlagEngine
 from careloop.flags.lexical_net import LexicalSafetyNet
 from careloop.models.data_models import SlotStatus
+from careloop.state.slot_store import SlotStore
 
 
 @pytest.fixture

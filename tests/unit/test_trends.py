@@ -1,8 +1,10 @@
 """
 Unit tests for Trend Analyzer (M4)
 """
-import pytest
 from datetime import date
+
+import pytest
+
 from careloop.trends.analyzer import TrendAnalyzer
 
 

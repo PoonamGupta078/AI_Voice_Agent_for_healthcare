@@ -2,10 +2,11 @@
 Unit tests for State Tracker and Planner (M2)
 """
 import pytest
+
 from careloop.config import load_slots
-from careloop.state.slot_store import SlotStore, EvidenceStore
 from careloop.models.data_models import SlotStatus
 from careloop.planner.planner import QuestionPlanner
+from careloop.state.slot_store import EvidenceStore, SlotStore
 
 
 @pytest.fixture

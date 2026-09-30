@@ -4,13 +4,13 @@ Simple keyword-based retrieval over KB documents (no embeddings needed for offli
 """
 import os
 import re
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 KB_DIR = os.path.join(os.path.dirname(__file__), "kb")
 SIMILARITY_THRESHOLD = 0.15  # Minimum similarity to provide an answer
 
 
-def load_kb() -> List[Dict[str, Any]]:
+def load_kb() -> list[dict[str, Any]]:
     """Load all KB documents from the kb/ directory."""
     docs = []
     for fname in sorted(os.listdir(KB_DIR)):
@@ -21,7 +21,7 @@ def load_kb() -> List[Dict[str, Any]]:
             content = f.read()
 
         # Parse frontmatter
-        meta: Dict[str, str] = {}
+        meta: dict[str, str] = {}
         body = content
         if content.startswith("---"):
             parts = content.split("---", 2)
@@ -55,7 +55,7 @@ class RAGRetriever:
         self.k = k
         self.threshold = threshold
 
-    def retrieve(self, query: str) -> List[Dict[str, Any]]:
+    def retrieve(self, query: str) -> list[dict[str, Any]]:
         """Return top-k docs matching the query, above threshold."""
         query_words = set(re.findall(r'\b\w+\b', query.lower()))
         # Remove common stop words
@@ -76,7 +76,7 @@ class RAGRetriever:
         return [{"score": s, **{k: v for k, v in d.items() if k != "words"}}
                 for s, d in scored[:self.k]]
 
-    def answer(self, query: str) -> Optional[Dict[str, Any]]:
+    def answer(self, query: str) -> dict[str, Any] | None:
         """Return an answer context or None if below threshold."""
         results = self.retrieve(query)
         if not results:
