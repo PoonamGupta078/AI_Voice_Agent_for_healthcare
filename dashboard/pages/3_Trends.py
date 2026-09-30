@@ -16,17 +16,18 @@ import yaml
 st.set_page_config(page_title="Trends — CareLoop", page_icon="📈", layout="wide")
 st.title("📈 Health Trends")
 
+if "session" not in st.session_state:
+    st.info("No live session is currently active. Please start a Live Session to see health trends.")
+    st.stop()
+
+session = st.session_state.session
+selected_pid = session.patient_id
+profile = session.profile
 BASE = os.path.join(os.path.dirname(__file__), "..", "..", "eval", "personas")
 
 def load_yaml(path):
     with open(path) as f:
         return yaml.safe_load(f)
-
-profiles_raw = load_yaml(os.path.join(BASE, "profiles.yaml"))
-persona_options = {p["name"]: pid for pid, p in profiles_raw.items()}
-selected_name = st.sidebar.selectbox("Select Patient", list(persona_options.keys()))
-selected_pid = persona_options[selected_name]
-profile = profiles_raw[selected_pid]
 
 truth = load_yaml(os.path.join(BASE, f"{selected_pid}_truth.yaml"))
 
@@ -38,6 +39,13 @@ for i, day_data in enumerate(truth["days"]):
     row["has_planted"] = len(day_data.get("planted_events", [])) > 0
     row["red_flag"] = any(e["flag_level"] == "red" for e in day_data.get("planted_events", []))
     rows.append(row)
+
+# Append LIVE session data
+live_row = {"day": len(rows) + 1, "date": "Live (Today)", "has_planted": False, "red_flag": len(session.flags_raised) > 0}
+for slot_id, state in session.slot_store.all_states().items():
+    if state.value is not None:
+        live_row[slot_id] = state.value
+rows.append(live_row)
 
 df = pd.DataFrame(rows)
 

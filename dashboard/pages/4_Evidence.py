@@ -18,44 +18,16 @@ st.set_page_config(page_title="Evidence — CareLoop", page_icon="🔍", layout=
 st.title("🔍 Evidence Explorer")
 st.caption("Every claim links back to a transcript turn.")
 
-BASE = os.path.join(os.path.dirname(__file__), "..", "..", "eval", "personas")
+if "session" in st.session_state:
+    session = st.session_state.session
+    store = session.slot_store
+    evidence_store = session.evidence_store
+    st.markdown(f"### Evidence Records for **{session.profile['name']}** — Live Session")
+else:
+    st.info("No live session is currently active. Please start a Live Session to see evidence records.")
+    st.stop()
 
-def load_yaml(path):
-    with open(path) as f:
-        return yaml.safe_load(f)
 
-profiles_raw = load_yaml(os.path.join(BASE, "profiles.yaml"))
-persona_options = {p["name"]: pid for pid, p in profiles_raw.items()}
-selected_name = st.sidebar.selectbox("Select Patient", list(persona_options.keys()))
-selected_pid = persona_options[selected_name]
-truth = load_yaml(os.path.join(BASE, f"{selected_pid}_truth.yaml"))
-
-day_options = list(range(1, len(truth["days"]) + 1))
-selected_day = st.sidebar.selectbox("Select Day", day_options, index=len(day_options) - 1)
-day_data = truth["days"][selected_day - 1]
-fact_sheet = day_data["slots"]
-
-# Build evidence store from fact sheet
-slots = load_slots()
-store = SlotStore(slots)
-evidence_store = EvidenceStore()
-
-for slot_id, val in fact_sheet.items():
-    spec = store.catalogue.get(slot_id)
-    if spec is None:
-        continue
-    if isinstance(val, bool):
-        status = SlotStatus.answered if val else SlotStatus.denied
-        quote = f"Patient said: {'yes' if val else 'no'}, {slot_id.replace('_', ' ')}"
-    elif val is not None:
-        status = SlotStatus.answered
-        quote = f"Patient reported {slot_id.replace('_', ' ')}: {val}"
-    else:
-        continue
-    store.update(slot_id, status, val, 0.9, "t1", quote)
-    evidence_store.add(selected_pid, f"day{selected_day}", slot_id, val, quote, "patient_statement", "t1")
-
-st.markdown(f"### Evidence Records for **{profiles_raw[selected_pid]['name']}** — Day {selected_day}")
 
 all_records = evidence_store.records
 if not all_records:
